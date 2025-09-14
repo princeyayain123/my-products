@@ -1,0 +1,35 @@
+.hide {
+  display: none;
+}
+
+pre {
+  margin: 0 !important;
+  display: inline-block;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  background: none;
+}
+
+::-webkit-input-placeholder {
+  color: #bbb;
+}
+
+::-moz-placeholder {
+  /* Firefox 19+ */
+  color: #bbb;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #bbb;
+}
+
+#result {
+  margin-bottom: 100px;
+}
