@@ -1083,7 +1083,7 @@ button {
   background-color: #ddd;
 }
 
-.stainless-steel:hover {
+.wood-grain:hover {
   background-color: #ddd;
 }
 
@@ -1492,7 +1492,7 @@ button#generate-pdf {
   margin-top: 10px;
 }
 
-.stainless-steel {
+.wood-grain {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1504,10 +1504,13 @@ button#generate-pdf {
   border-radius: 10px;
 }
 
-.stainless-steel .color-option {
-  background: linear-gradient(135deg, #d7d7d7 0%, #f0f0f0 25%, #bcbcbc 50%, #f0f0f0 75%, #d7d7d7 100%);
-  background-size: 200% 200%;
+.wood-grain .color-option {
+  background: url('../assets/wood/wood-diffuse_124.jpg') repeat;
+  background-size: cover;
+  border: 1px solid #8b5a2b;
+  border-radius: 50%;
 }
+
 
 @keyframes outline {
   from {
