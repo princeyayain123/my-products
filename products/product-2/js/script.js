@@ -36,6 +36,9 @@ let quiltMesh = "Quilting_002";
 let perimeterPiping = "main_002002";
 let insertPiping = "accent_001";
 
+// Model path
+let modelPath = "./assets/model/model.glb";
+
 init();
 loadModel();
 
@@ -193,7 +196,7 @@ function loadModel() {
   });
 
   const loader = new GLTFLoader(loadingManager);
-  loader.load("./assets/model/model.glb", (gltf) => {
+  loader.load(modelPath, (gltf) => {
     model = gltf.scene;
     model.scale.set(2.5, 2.5, 2.5);
     model.position.y = -1;
@@ -360,9 +363,9 @@ function createGUI() {
       baseColorPath: "./assets/quilting/quilting_dbasecolortexture.png",
       metallicRoughnessPath: "./assets/quilting/quilting_dmetallicroughnesstex.jpg",
       normalMapPath: "./assets/quilting/quilting_dnormalmap.jpg",
-      repeatX: 3,
-      repeatY: 3,
-      alpha: 0.79,
+      repeatX: 10,
+      repeatY: 10,
+      alpha: 0.96,
     },
     {
       name: "quilting_e",
@@ -635,34 +638,58 @@ function createGUI() {
     });
   });
 
-  document.querySelector(".stainless-steel").addEventListener("click", () => {
-    // Stainless steel texture paths
-    const stainlessTextures = {
-      map: loader.load("./assets/quilting/Metal012_2K-JPG_Color.jpg"),
-      metalRoughMap: loader.load("assets/quilting/Metal012_2K-JPG_Metalness-Metal012_2K-JPG_Roughness.png"),
-      normalMap: loader.load("./assets/quilting/Metal012_2K-JPG_NormalGL.jpg"),
+  document.querySelector(".wood-grain").addEventListener("click", () => {
+    // Load wood textures with proper wrapping and encoding
+    const woodTextures = {
+      map: loader.load("./assets/wood/wood-diffuse_124.jpg"),
+      roughnessMap: loader.load("./assets/wood/wood-smooth_124.jpg"),
+      bumpMap: loader.load("./assets/wood/wood-generic_bump.jpg"),
+      normalMap: loader.load("./assets/wood/wood-_normal_124.jpg"),
     };
 
+    // Ensure textures repeat seamlessly and use correct color encoding
+    Object.values(woodTextures).forEach((texture, index) => {
+      if (texture) {
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.needsUpdate = true;
+      }
+    });
+
+    // Set correct encoding for each map
+    woodTextures.map.encoding = THREE.sRGBEncoding; // Color texture
+    woodTextures.normalMap.encoding = THREE.LinearEncoding; // Normal map
+    woodTextures.roughnessMap.encoding = THREE.LinearEncoding; // Roughness map
+    woodTextures.bumpMap.encoding = THREE.LinearEncoding; // Bump map
+
+    // Optionally, scale the texture if it appears too big or too small
+    woodTextures.map.repeat.set(4, 4);
+    woodTextures.normalMap.repeat.set(4, 4);
+    woodTextures.roughnessMap.repeat.set(4, 4);
+    woodTextures.bumpMap.repeat.set(4, 4);
+
+    // Find the correct material
     const selectedMaterial = materialsList.find((mat) => mat.name === ArmRest);
 
     if (selectedMaterial) {
-      document.querySelector(".hardwareColor").innerHTML = "Stainless Steel";
+      // Update UI
+      document.querySelector(".hardwareColor").innerHTML = "Wood Grain";
 
-      selectedMaterial.map = stainlessTextures.map;
+      // Assign texture maps
+      selectedMaterial.map = woodTextures.map;
+      selectedMaterial.roughnessMap = woodTextures.roughnessMap;
+      selectedMaterial.bumpMap = woodTextures.bumpMap;
+      selectedMaterial.normalMap = woodTextures.normalMap;
 
-      // Apply the same combined texture to both
-      selectedMaterial.metalnessMap = stainlessTextures.metalRoughMap;
-      selectedMaterial.roughnessMap = stainlessTextures.metalRoughMap;
-
-      selectedMaterial.normalMap = stainlessTextures.normalMap;
-
-      // Optional neutral color
+      // Ensure the base color doesn't darken the texture
       selectedMaterial.color.set("#ffffff");
 
-      // These values let the texture maps fully take effect
-      selectedMaterial.metalness = 1;
-      selectedMaterial.roughness = 1;
+      // Fine-tune material properties for realistic wood
+      selectedMaterial.metalness = 0.2; // Wood is non-metallic
+      selectedMaterial.roughness = 0.5; // Fully rough, controlled by roughnessMap
+      selectedMaterial.bumpScale = 0.6; // Start small, increase if needed
 
+      // Update the material
       selectedMaterial.needsUpdate = true;
     }
   });
