@@ -13,17 +13,28 @@ let isTransitioning = false;
 let transitionStartTime = null;
 let transitionDuration = 1000;
 let targetPosition = new THREE.Vector3();
-let textureName = "quilting_a.001";
-let materialName = "Main_Color";
-let currentMaterial = "Main_Color";
-let currentPrimaryThread = "stitches";
-let quiltedStitcheName = "quilting_a_stitches.001";
+
 let lastTouchDistance = null;
 const fadeMaterials = new Map();
 const container = document.getElementById("container");
 const agreeButton = document.querySelector(".agreementButton");
 const materialsList = [];
 const loader = new THREE.TextureLoader();
+
+// Material Property Names
+let materialName = "Main_Color";
+let currentMaterial = "Main_Color";
+let textureName = "Q_Wave";
+let currentPrimaryThread = "stitches";
+let quiltedStitcheName = "Q_Wave_Stitches";
+let ArmRest = "Arm";
+let accent = "Accent_Color.002";
+
+// Mesh Names
+let stitchMesh = "Stitch_Bolster_Single_004";
+let quiltMesh = "Quilting_002";
+let perimeterPiping = "main_002002";
+let insertPiping = "accent_001";
 
 init();
 loadModel();
@@ -190,6 +201,7 @@ function loadModel() {
 
     model.traverse((object) => {
       if (object.isMesh) {
+        console.log(object.name);
         object.castShadow = true;
         object.receiveShadow = true;
         if (!materialsList.includes(object.material)) {
@@ -247,7 +259,7 @@ function createGUI() {
 
   function toggleVisibilty(model, none, have, img, span) {
     const mesh = scene.getObjectByName(model);
-    const stitchArmrest = scene.getObjectByName("Stitch_Single_Armrest001");
+    const stitchArmrest = scene.getObjectByName(stitchMesh);
 
     if (mesh) {
       mesh.visible = !mesh.visible;
@@ -260,13 +272,13 @@ function createGUI() {
 
       // special case for stitch
       if (mesh.visible && stitchArmrest) {
-        currentPrimaryThread = "Accent_Color.002";
-        if (model !== "accent_001") stitchArmrest.visible = false;
+        currentPrimaryThread = accent;
+        if (model !== insertPiping) stitchArmrest.visible = false;
       }
     }
   }
 
-  function changeQuiltingTextures({ meshName = "quilting_a", baseColorPath, metallicRoughnessPath, normalMapPath, repeatX = 4, repeatY = 4, alpha = 1 }) {
+  function changeQuiltingTextures({ meshName = quiltMesh, baseColorPath, metallicRoughnessPath, normalMapPath, repeatX = 4, repeatY = 4, alpha = 1 }) {
     const quiltingMesh = scene.getObjectByName(meshName);
     if (!quiltingMesh || !quiltingMesh.material) {
       console.warn(`Mesh "${meshName}" not found or missing material`);
@@ -376,7 +388,7 @@ function createGUI() {
       name: "quilting a s 002",
       label: "None",
       textureName: "quilting_a_stitches.001",
-      hide: ["quilting_a"],
+      hide: [quiltMesh],
     },
   ];
 
@@ -389,7 +401,7 @@ function createGUI() {
 
       if (style.baseColorPath) {
         changeQuiltingTextures({
-          meshName: "quilting_a",
+          meshName: quiltMesh,
           baseColorPath: style.baseColorPath,
           metallicRoughnessPath: style.metallicRoughnessPath,
           normalMapPath: style.normalMapPath,
@@ -398,7 +410,7 @@ function createGUI() {
           alpha: style.alpha,
         });
 
-        toggleMeshes("quilting_a");
+        toggleMeshes(quiltMesh);
       } else {
         toggleMeshes(style.name, style.hide || []);
       }
@@ -414,7 +426,7 @@ function createGUI() {
     });
   });
 
-  toggleMeshes("Stitch_Single_Armrest001", ["Stitch_Single_Backrest_Back005", "Stitch_Double_Backrest_Front_010", "Stitch_Double_Backrest_Front_012"]);
+  toggleMeshes(stitchMesh, ["Stitch_Single_Backrest_Back005", "Stitch_Double_Backrest_Front_010", "Stitch_Double_Backrest_Front_012"]);
 
   document.querySelectorAll("#stitchesHave").forEach((element, index) => {
     element.addEventListener("click", () => {
@@ -423,10 +435,10 @@ function createGUI() {
       document.querySelector(".stitchesStyleMaterial").innerHTML = imgElement.alt;
       switch (index) {
         case 0:
-          toggleMeshes("Stitch_Single_Armrest001", ["Stitch_Single_Backrest_Back005", "main_002002"]);
+          toggleMeshes(stitchMesh, ["Stitch_Single_Backrest_Back005", perimeterPiping]);
           break;
         case 1:
-          toggleMeshes("", ["Stitch_Double_Backrest_Front_012", "Stitch_Single_Armrest001"]);
+          toggleMeshes("", ["Stitch_Double_Backrest_Front_012", stitchMesh]);
           break;
         default:
           console.warn("Invalid index.");
@@ -440,10 +452,10 @@ function createGUI() {
   const perimeterImg = perimeterBlock.querySelector("img");
   const perimeterSpan = document.getElementById("perimeter_piping");
 
-  toggleVisibilty("main_002002", "assets/textures/perimeterhave.png", "assets/textures/perimeternone.png", perimeterImg, perimeterSpan);
+  toggleVisibilty(perimeterPiping, "assets/textures/perimeterhave.png", "assets/textures/perimeternone.png", perimeterImg, perimeterSpan);
 
   perimeterBlock.addEventListener("click", () => {
-    toggleVisibilty("main_002002", "assets/textures/perimeterhave.png", "assets/textures/perimeternone.png", perimeterImg, perimeterSpan);
+    toggleVisibilty(perimeterPiping, "assets/textures/perimeterhave.png", "assets/textures/perimeternone.png", perimeterImg, perimeterSpan);
     document.getElementById("stitchesStyleMaterial").innerHTML = "None";
   });
 
@@ -453,7 +465,7 @@ function createGUI() {
   const insertSpan = document.getElementById("insert_piping");
 
   insertBlock.addEventListener("click", () => {
-    toggleVisibilty("accent_001", "assets/textures/innernone.png", "assets/textures/innerhave.png", insertImg, insertSpan);
+    toggleVisibilty(insertPiping, "assets/textures/innernone.png", "assets/textures/innerhave.png", insertImg, insertSpan);
   });
 
   function changeColor(color, colorName) {
@@ -604,7 +616,8 @@ function createGUI() {
       const colorName = option.querySelector(".color-title").textContent;
       const color = option.getAttribute("data-color");
 
-      const selectedMaterial = materialsList[0];
+      const selectedMaterial = materialsList.find((mat) => mat.name === ArmRest);
+
       if (selectedMaterial) {
         document.querySelector(".hardwareColor").innerHTML = colorName;
 
@@ -630,7 +643,7 @@ function createGUI() {
       normalMap: loader.load("./assets/quilting/Metal012_2K-JPG_NormalGL.jpg"),
     };
 
-    const selectedMaterial = materialsList[0];
+    const selectedMaterial = materialsList.find((mat) => mat.name === ArmRest);
 
     if (selectedMaterial) {
       document.querySelector(".hardwareColor").innerHTML = "Stainless Steel";
@@ -666,10 +679,10 @@ function createGUI() {
           case 1:
             materialName = textureName;
             break;
+          // case 2:
+          //   materialName = "Arm_Side";
+          //   break;
           case 2:
-            materialName = "Arm_Side";
-            break;
-          case 3:
             materialName = "Headrest";
             break;
           // case 5:

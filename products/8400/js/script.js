@@ -461,6 +461,7 @@ function createGUI() {
       materialName = "quilting_a.001";
     }
 
+    console.log(materialName);
     document.getElementById(materialName).innerHTML = colorName;
     currentMaterial.color.set(color);
   }
