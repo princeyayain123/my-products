@@ -99,10 +99,10 @@ function init() {
   });
 
   $(document).ready(() => {
-    onWindowResize(); // Set initial dimensions
+    onWindowResize();
     $(window).on("resize", debounce(onWindowResize, 0));
     window.addEventListener("orientationchange", () => {
-      onWindowResize(); // Handle orientation change
+      onWindowResize();
     });
   });
 }
@@ -204,7 +204,6 @@ function loadModel() {
 
     model.traverse((object) => {
       if (object.isMesh) {
-        console.log(object.name);
         object.castShadow = true;
         object.receiveShadow = true;
         if (!materialsList.includes(object.material)) {
@@ -643,7 +642,6 @@ function createGUI() {
     const woodTextures = {
       map: loader.load("./assets/wood/wood-diffuse_124.jpg"),
       roughnessMap: loader.load("./assets/wood/wood-smooth_124.jpg"),
-      bumpMap: loader.load("./assets/wood/wood-generic_bump.jpg"),
       normalMap: loader.load("./assets/wood/wood-_normal_124.jpg"),
     };
 
@@ -660,13 +658,11 @@ function createGUI() {
     woodTextures.map.encoding = THREE.sRGBEncoding; // Color texture
     woodTextures.normalMap.encoding = THREE.LinearEncoding; // Normal map
     woodTextures.roughnessMap.encoding = THREE.LinearEncoding; // Roughness map
-    woodTextures.bumpMap.encoding = THREE.LinearEncoding; // Bump map
 
     // Optionally, scale the texture if it appears too big or too small
     woodTextures.map.repeat.set(4, 4);
     woodTextures.normalMap.repeat.set(4, 4);
     woodTextures.roughnessMap.repeat.set(4, 4);
-    woodTextures.bumpMap.repeat.set(4, 4);
 
     // Find the correct material
     const selectedMaterial = materialsList.find((mat) => mat.name === ArmRest);
@@ -678,7 +674,6 @@ function createGUI() {
       // Assign texture maps
       selectedMaterial.map = woodTextures.map;
       selectedMaterial.roughnessMap = woodTextures.roughnessMap;
-      selectedMaterial.bumpMap = woodTextures.bumpMap;
       selectedMaterial.normalMap = woodTextures.normalMap;
 
       // Ensure the base color doesn't darken the texture
@@ -687,7 +682,6 @@ function createGUI() {
       // Fine-tune material properties for realistic wood
       selectedMaterial.metalness = 0.2; // Wood is non-metallic
       selectedMaterial.roughness = 0.5; // Fully rough, controlled by roughnessMap
-      selectedMaterial.bumpScale = 0.6; // Start small, increase if needed
 
       // Update the material
       selectedMaterial.needsUpdate = true;
